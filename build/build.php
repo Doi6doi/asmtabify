@@ -45,8 +45,11 @@ class Build {
       if ( in_array($cmd, ['local', 'all', 'phar']) )
          $this->needWritablePhar();
       switch ($cmd) {
-         case 'local': $this->bin([$this->current()], true); break;
-         case 'all': $this->bin(array_keys(self::TARGETS), false); break;
+         case 'local': $this->bin([$this->current()], null); break;
+         case 'all':
+            $version = $this->version($args[0] ?? null);
+            $this->bin(array_keys(self::TARGETS), $version);
+            break;
          case 'phar': $this->phar(); break;
          case 'clean': $this->clean(); break;
          default: throw new Exception($this->usage($cmd));
@@ -97,12 +100,20 @@ class Build {
       echo "phar: $file (".filesize($file)." bytes)\n";
    }
 
-   /// A PHAR és célonként a micro.sfx összefűzése; $short: asmtabify(.exe)
-   protected function bin(array $targets, bool $short) {
+   /// A kiadás verziója: az argumentum, különben a VERSION fájl
+   protected function version(?string $arg): string {
+      $v = trim((string)($arg ?? @file_get_contents($this->root.'/VERSION')));
+      if ( ! preg_match('/^\d+(\.\d+)+(-[\w.]+)?$/', $v) )
+         throw new Exception("Invalid or missing version '$v' (see VERSION)");
+      return $v;
+   }
+
+   /// PHAR + micro.sfx célonként; verzió nélkül (local): asmtabify(.exe)
+   protected function bin(array $targets, ?string $version) {
       $this->phar();
       $phar = file_get_contents($this->dir.'/asmtabify.phar');
       foreach ($targets as $t) {
-         $name = $short ? 'asmtabify' : "asmtabify-$t";
+         $name = null === $version ? 'asmtabify' : "asmtabify-$version-$t";
          $dest = $this->dir.'/'.$name.self::TARGETS[$t][1];
          file_put_contents($dest, file_get_contents($this->sfx($t)).$phar);
          chmod($dest, 0755);
@@ -148,10 +159,11 @@ class Build {
    /// Hibás parancs esetén a hibaüzenet és a használati útmutató
    protected function usage(string $cmd): string {
       return "Unknown command: $cmd\n\n"
-         ."Usage: php build/build.php [command]\n\n"
+         ."Usage: php build/build.php [command] [version]\n\n"
          ."Commands:\n"
          ."  local    this machine: build/asmtabify(.exe), the default\n"
-         ."  all      binaries for every target: build/asmtabify-<target>\n"
+         ."  all      every target: build/asmtabify-<version>-<target>\n"
+         ."           the version is in the VERSION file, or give it here\n"
          ."  phar     only build/asmtabify.phar\n"
          ."  clean    remove everything built or downloaded (binaries, phar,\n"
          ."           micro.sfx files, zip and tar.gz archives)\n\n"

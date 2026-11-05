@@ -15,8 +15,10 @@ Csak whitespace változik. A fókusz a címke + ugrás típusú nyelveken van.
   ellenőrizve (bájtra azonos objektum).
 - `-l auto`: nyelvfelismerés, a legjobb `detect()` nyer, 0,85 alatt nincs találat.
 - `build/build.php`: `local` (az aktuális gépre: `build/asmtabify(.exe)`),
-  `all` (mind: `build/asmtabify-<cél>`), `phar`, `clean` (mindent töröl, amit a
-  build készített vagy letöltött). Minden a `build` könyvtárban, alkönyvtár
+  `all` (mind: `build/asmtabify-<verzió>-<cél>`, a verzió a `VERSION` fájlból,
+  vagy argumentumként: `php build/build.php all 0.2`), `phar`, `clean` (mindent
+  töröl, amit a build készített vagy letöltött). A `VERSION` fájl a verzió
+  egyetlen forrása (a Git követi, így a forrás-zipekben is benne van). Minden a `build` könyvtárban, alkönyvtár
   nélkül. PHAR és önálló binárisok (static-php-cli `micro.sfx` + PHAR) három célra (Linux x86_64,
   macOS Apple Silicon, Windows x86_64), egy gépen. Más célt a `TARGETS`
   konstans bővítésével bárki hozzáadhat.
@@ -36,8 +38,12 @@ Csak whitespace változik. A fókusz a címke + ugrás típusú nyelveken van.
 
 ## Következik
 
-- Packagist: a `name` vendor része most `your-vendor` (cserélni kell), Git-repó,
-  a verziók címkékből (`v0.1.0`), webhook az automatikus frissítéshez.
+- Kiadás menete: a `VERSION` átírása, commit, `php build/build.php all`, majd a
+  címke (`v<verzió>`) és a GitHub Release a binárisok feltöltésével. (Az első
+  `git push origin v0.1.0` `fatal error in commit_refs_rules` hibát adott, a
+  Release a weben is kipróbálandó.)
+- Packagist: a repó (`https://github.com/Doi6doi/asmtabify`) beküldése, a
+  verziók a címkékből jönnek (`v0.1`), webhook az automatikus frissítéshez.
 - A macOS és Windows binárisok futtatása nincs kipróbálva (csak Linuxon). A
   `.gitignore`-ba: `build/asmtabify*`, `build/micro-*.sfx`.
 - README: telepítés (a Releases-ből és Composerrel), támogatott nyelvek és a
