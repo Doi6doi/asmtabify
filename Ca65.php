@@ -10,29 +10,25 @@ class Ca65 extends Lang {
    // egyenlőség: név := érték, vagy név = érték
    const EQUATE = '/^\s*[A-Za-z_@][\w@]*\s*:?=/';
    // utasítás és operandus
-   const INSTR = '/^(?<op>\S+)\s*(?<arg>.*?)\s*$/';
+   const INSTR = '/^\s*(?<op>\S+)\s*(?<arg>.*?)\s*$/';
    // célcímke az operandusban (a (cím), :+ és kifejezések nem azok)
    const DEST = '/^[A-Za-z_@][\w@]*$/';
    const COND = '/^b(cc|cs|eq|mi|ne|pl|vc|vs)$/i';
    const JUMP = '/^(jmp|bra)$/i';
-   // felismeréshez: ca65-re jellemző direktíva, illetve 6502 utasítás
-   const DIRECTIVE = '/^\s*\.(org|setcpu|segment|proc|endproc|import|importzp'
-      .'|export|exportzp|macro|endmacro|scope|endscope|byte|word|addr)\b/i';
-   const MNEMONIC = '/^\s+(lda|ldx|ldy|sta|stx|sty|jsr|rts|jmp|bne|beq'
-      .'|inx|iny|dex|dey)\b/i';
-   // a tab karakter szélessége a címke utáni igazításhoz
-   const TABW = 8;
+   // ismert sorkezdet: direktíva (.név) vagy 6502/65C02 mnemonik
+   const KNOWN = '/^(?:\.[A-Za-z]\w*|(?:adc|and|asl|bcc|bcs|beq|bit|bmi|bne'
+      .'|bpl|brk|bvc|bvs|clc|cld|cli|clv|cmp|cpx|cpy|dec|dex|dey|eor|inc'
+      .'|inx|iny|jmp|jsr|lda|ldx|ldy|lsr|nop|ora|pha|php|pla|plp|rol|ror'
+      .'|rti|rts|sbc|sec|sed|sei|sta|stx|sty|tax|tay|tsx|txa|txs|tya'
+      .'|bra|phx|phy|plx|ply|stz|trb|tsb))(?:\s|$)/i';
 
-   /// Igaz, ha ca65-re jellemző direktíva vagy elég 6502 utasítás van
-   static function detect(array $lines): bool {
-      $n = 0;
-      foreach ($lines as $row) {
-         if ( preg_match(self::DIRECTIVE, $row) )
-            return true;
-         if ( preg_match(self::MNEMONIC, $row) && ++$n >= 3 )
-            return true;
-      }
-      return false;
+   /// Igaz, ha a kódsor címke, egyenlőség, direktíva vagy ismert mnemonik
+   protected function known(string $code): bool {
+      if ( preg_match(self::LABEL, $code, $m) )
+         $code = $m['rest'];
+      elseif ( preg_match(self::EQUATE, $code) )
+         return true;
+      return '' === $code || 1 === preg_match(self::KNOWN, $code);
    }
 
    /// Egy sor feldarabolása: címke, mnemonik, ugrás, cél, komment
@@ -70,13 +66,6 @@ class Ca65 extends Lang {
       $head = $op->label.':';
       $rest = ltrim(substr($row, strlen($head)));
       return '' === $rest ? $head : $head.$this->pad($tab, strlen($head)).$rest;
-   }
-
-   /// A címke utáni szóköz/tab: a címke hosszát levonja a behúzásból
-   protected function pad(string $tab, int $len): string {
-      if (' ' === $tab[0])
-         return str_repeat(' ', max(1, strlen($tab) - $len));
-      return str_repeat("\t", max(1, strlen($tab) - intdiv($len, self::TABW)));
    }
 
 }
