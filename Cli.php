@@ -23,7 +23,7 @@ class Cli {
    protected $ops;
    protected $labs;
 
-   /// Egyelőre nem csinál semmit, a futtatás később kerül ide.
+   /// A program lépései: paraméterek, beolvasás, tabulálás, kiírás
    function run(array $argv) {
       $this->getParams($argv);
       $this->read();
@@ -92,6 +92,8 @@ class Cli {
          case "-d": $this->maxDepth = $this->arg($argv); break;
          case "-x": $this->exclude[] = $this->arg($argv); break;
          case '-l': $this->lang = $this->arg($argv); break;
+         case "-h":
+         case "--help": $this->help(); break;
          default:
             if ( '-' === substr($a, 0, 1) )
                throw new Exception("Unknown option: $a");
@@ -193,8 +195,14 @@ class Cli {
          throw new Exception("Could not write ".$out );
    }
 
-   /// Hibaüzenet (ha van) és használati útmutató kiírása, majd kilépés
-   protected function usage($msg) {
+   /// A súgó kiírása a szabványos kimenetre, majd kilépés (-h)
+   protected function help() {
+      fwrite(STDOUT, $this->usageText());
+      exit(0);
+   }
+
+   /// A használati útmutató szövege
+   protected function usageText(): string {
       $ret = [
          "",
          "Usage: php asmtabify.php <input> [options]",
@@ -202,15 +210,21 @@ class Cli {
          "Options:",
          "  -o <output>: Output file",
          "  -l <lang>: Assembly language (`ca65`, `nasm`, `auto`)",
-         "  -t <n>: Tabs with `n` spaces or ith `tab`",
+         "  -t <n>: Tabs with `n` spaces or with `tab`",
          "  -m <n>: A block's maximum size is <n> lines (default:500)",
          "  -d <n>: Maximum nesting depth is <n> tabs (default: 30)",
          "  -x <range>: Do not tabulate lines `10-20` or labels `a-b`",
          "              (inclusive, can be repeated)",
+         "  -h, --help: Show this help",
          "",
          ""
       ];
-      fwrite(STDERR, implode("\n",$ret));
+      return implode("\n", $ret);
+   }
+
+   /// Hibaüzenet (ha van) és használati útmutató kiírása, majd kilépés
+   protected function usage($msg) {
+      fwrite(STDERR, $this->usageText());
       if ($msg) {
          fwrite(STDERR, "Error: $msg\n\n");
          exit(1);

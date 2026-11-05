@@ -2,6 +2,7 @@
    "name": "doi6doi/asmtabify",
    "description": "Tabulates assembly source by its jumps, so loops and ifs become visible",
    "type": "library",
+   "homepage": "https://github.com/doi6doi/asmtabify",
    "keywords": ["assembly", "disassembler", "formatter", "indentation", "nasm", "ca65"],
    "license": "LicenseRef-Free-LLM-License",
    "authors": [
@@ -16,11 +17,13 @@
    },
    "bin": ["bin/asmtabify"],
    "scripts": {
+      "test": "@php test/run.php",
       "build": "@php build/build.php local",
       "package": "@php build/build.php all",
       "clean": "@php build/build.php clean"
    },
    "scripts-descriptions": {
+      "test": "Run the tests (test/run.php)",
       "build": "Build the standalone binary for this machine (build/asmtabify)",
       "package": "Build the standalone binaries for every target",
       "clean": "Remove everything the build produced or downloaded"

@@ -4,7 +4,7 @@ AsmTabify is a disassemble helping tool. It tabulates
 an assembly source so that loops, ifs can be seen better.
 
 It does not modify the assembly apart from tabulating so the
-assmebled result will be the same.
+assembled result will be the same.
 
 ## Example
 
@@ -53,7 +53,7 @@ object file is byte for byte the same as before.
 
 Grab a no-dependencies binary for your system from the Releases page.
 
-You may need to rename it and chmod +x on macOS and linux.
+You may need to rename it and chmod +x on macOS and Linux.
 
 ### Option 2: Composer
 
@@ -71,9 +71,10 @@ Options:
    -l <lang>: Assembly language (ca65, nasm, auto)
    -t <n>: Number of spaces for a tab. `tab` means a literal tab
    -m <n>: Blocks longer than `n` will not be tabulated (default: 500)
-   -d <n>: Maximum tab depth (deault:30)
+   -d <n>: Maximum tab depth (default:30)
    -x <range>: Do not tabulate a range. Lines `10-20` or labels `first-last`,
       both ends included. Can be given more than once
+   -h, --help: Show the help
 ```
 
 Data that the disassembler decoded as code (a byte table full of fake
