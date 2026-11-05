@@ -1,5 +1,7 @@
 <?php
 
+namespace AsmTabify;
+
 /// A ca65 (cc65 csomag) assembly nyelve
 class Ca65 extends Lang {
 
@@ -21,6 +23,11 @@ class Ca65 extends Lang {
       .'|inx|iny|jmp|jsr|lda|ldx|ldy|lsr|nop|ora|pha|php|pla|plp|rol|ror'
       .'|rti|rts|sbc|sec|sed|sei|sta|stx|sty|tax|tay|tsx|txa|txs|tya'
       .'|bra|phx|phy|plx|ply|stz|trb|tsb))(?:\s|$)/i';
+
+   /// A sor kódrésze, komment nélkül
+   protected function code(string $row): string {
+      return preg_match(self::SPLIT, $row, $m) ? $m['code'] : $row;
+   }
 
    /// Igaz, ha a kódsor címke, egyenlőség, direktíva vagy ismert mnemonik
    protected function known(string $code): bool {

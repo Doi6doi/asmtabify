@@ -1,0 +1,31 @@
+{
+   "name": "doi6doi/asmtabify",
+   "description": "Tabulates assembly source by its jumps, so loops and ifs become visible",
+   "type": "library",
+   "keywords": ["assembly", "disassembler", "formatter", "indentation", "nasm", "ca65"],
+   "license": "LicenseRef-Free-LLM-License",
+   "authors": [
+      {"name": "Zoltán Várnagy"}
+   ],
+   "require": {
+      "php": ">=7.4"
+   },
+   "autoload": {
+      "psr-4": {"AsmTabify\\": ""},
+      "exclude-from-classmap": ["/build/", "/test/"]
+   },
+   "bin": ["bin/asmtabify"],
+   "scripts": {
+      "build": "@php build/build.php local",
+      "package": "@php build/build.php all",
+      "clean": "@php build/build.php clean"
+   },
+   "scripts-descriptions": {
+      "build": "Build the standalone binary for this machine (build/asmtabify)",
+      "package": "Build the standalone binaries for every target",
+      "clean": "Remove everything the build produced or downloaded"
+   },
+   "config": {
+      "sort-packages": true
+   }
+}

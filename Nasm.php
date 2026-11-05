@@ -1,5 +1,7 @@
 <?php
 
+namespace AsmTabify;
+
 /// A NASM (Netwide Assembler) x86 assembly nyelve
 class Nasm extends Lang {
 
@@ -41,6 +43,11 @@ class Nasm extends Lang {
 
    // a helyi (.név) címkék szülője: az utolsó nem helyi címke
    protected $scope = '';
+
+   /// A sor kódrésze, komment nélkül
+   protected function code(string $row): string {
+      return preg_match(self::SPLIT, $row, $m) ? $m['code'] : $row;
+   }
 
    /// Igaz, ha a kódsor címke, rögzített sor vagy ismert mnemonik
    protected function known(string $code): bool {

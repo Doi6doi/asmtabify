@@ -1,22 +1,84 @@
 # AsmTabify
 
-Az AsmTabify egy disassemblálást segítő eszköz. Egy assembly
-kódot tabulál, hogy a loop-ok, blokk ifek, stb látszódjanak.
-Nem módosítja az assembly fájlt, így a lefordított bináris is 
-változatlan marad.
+AsmTabify is a disassemble helping tool. It tabulates
+an assembly source so that loops, ifs can be seen better.
 
-## Cli
+It does not modify the assembly apart from tabulating so the
+assmebled result will be the same.
 
-A program parancssorban futtatható:
+## Example
 
-php tabify.php <input> [options]
+A flat 64-bit x86 (NASM) function, as a disassembler or a quick listing
+would give it:
+
+```nasm
+sum_positive:
+    xor     eax, eax
+.next:
+    mov     edx, [rdi]
+    test    edx, edx
+    jle     .skip
+    add     eax, edx
+.skip:
+    add     rdi, 4
+    dec     rsi
+    jnz     .next
+    ret
+```
+
+After `asmtabify sum.asm` (the default tab is 2 spaces):
+
+```nasm
+sum_positive:
+  xor     eax, eax
+.next:
+    mov     edx, [rdi]
+    test    edx, edx
+    jle     .skip
+      add     eax, edx
+.skip:
+    add     rdi, 4
+    dec     rsi
+    jnz     .next
+  ret
+```
+
+The backward jump `jnz .next` makes the lines up to it a loop, the forward
+conditional jump `jle .skip` makes `add eax, edx` an `if` body. The assembled
+object file is byte for byte the same as before.
+
+## Install
+
+### Option 1: Self-contained binary
+
+Grab a no-dependencies binary for your system from the Releases page.
+
+You may need to rename it and chmod +x on macOS and linux.
+
+### Option 2: Composer
+
+```
+composer global require doi6doi/asmtabify
+```
+
+## Usage
+
+```
+asmtabify <input> [options]
 
 Options:
-   -o <output>: Kimeneti fájl. Ha nincs megadva, felülírja a bemenetet
-   -t <n>: egy behúzás `n` szóközt jelent (alap:2)
-   -m <n>: egy blokk max `n` sor lehet, az ennél nagyobbakra 
-      nem csinál behúzást.
-   -l <lang>: az assembly nyelve `lang`. (ca65, nasm). (alap:auto) 
+   -o <output>: Output file. If not present, the input will be overwritten
+   -l <lang>: Assembly language (ca65, nasm, auto)
+   -t <n>: Number of spaces for a tab. `tab` means a literal tab
+   -m <n>: Blocks longer than `n` will not be tabulated (default: 500)
+   -d <n>: Maximum tab depth (deault:30)
+   -x <range>: Do not tabulate a range. Lines `10-20` or labels `first-last`,
+      both ends included. Can be given more than once
+```
+
+Data that the disassembler decoded as code (a byte table full of fake
+branches) can nest absurdly deep. Exclude such a range with `-x`, or better,
+mark it as data in the disassembler.
 
 
 

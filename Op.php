@@ -1,5 +1,7 @@
 <?php
 
+namespace AsmTabify;
+
 /// Egy feldarabolt assembly sor, a Lang::parse() eredménye
 class Op {
 
